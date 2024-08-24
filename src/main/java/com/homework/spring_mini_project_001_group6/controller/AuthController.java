@@ -6,7 +6,7 @@ import com.homework.spring_mini_project_001_group6.model.dto.response.ApiRespons
 import com.homework.spring_mini_project_001_group6.model.dto.response.LoginResponse;
 import com.homework.spring_mini_project_001_group6.service.CustomUserDetailsService;
 import com.homework.spring_mini_project_001_group6.service.UserService;
-import com.homework.spring_mini_project_001_group6.security.JwtUtil;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,16 +19,16 @@ public class AuthController {
 
     private final UserService userService;
     private final CustomUserDetailsService customUserDetailsService;
-    private final JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<?>> registerUser(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<ApiResponse<?>> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
+        registerRequest.setRole(registerRequest.getRole());
         userService.registerUser(registerRequest);
         return new ResponseEntity<>(new ApiResponse<>("User registered successfully, you can now login.", HttpStatus.CREATED, null), HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> loginUser(@RequestBody JwtRequest jwtRequest) {
+    public ResponseEntity<ApiResponse<LoginResponse>> loginUser(@Valid @RequestBody JwtRequest jwtRequest) {
         String token = customUserDetailsService.authenticateAndGetToken(jwtRequest);
         LoginResponse loginResponse = new LoginResponse(token);
         return new ResponseEntity<>(new ApiResponse<>("Login successful", HttpStatus.OK, loginResponse), HttpStatus.OK);

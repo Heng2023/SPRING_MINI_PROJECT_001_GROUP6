@@ -1,5 +1,6 @@
 package com.homework.spring_mini_project_001_group6.service;
 
+import com.homework.spring_mini_project_001_group6.exception.InvalidDataException;
 import com.homework.spring_mini_project_001_group6.model.dto.requestbody.RegisterRequest;
 import com.homework.spring_mini_project_001_group6.model.entity.User;
 import com.homework.spring_mini_project_001_group6.repository.UserRepository;
@@ -17,6 +18,15 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     public void registerUser(RegisterRequest registerRequest) {
+
+         if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
+            throw new InvalidDataException("Email is already in use.");
+        }
+
+        if (userRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
+            throw new InvalidDataException("Username is already in use.");
+        }
+
         User user = new User();
         user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
