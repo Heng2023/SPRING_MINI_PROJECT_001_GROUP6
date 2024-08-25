@@ -11,4 +11,7 @@ import java.util.List;
 public interface ArticleService {
     ApiResponse<ArticleResponse> createArticle(ArticleRequest articleRequest, Long userId);
     ApiResponse<List<ArticleWithCategoryResponse>> getAllArticles(Pageable pageable);
+    ApiResponse<ArticleWithCategoryResponse> findArticleById(Long articleId);
+    ApiResponse<Void> deleteArticle(Long articleId);
+    ApiResponse<ArticleResponse> updateArticle(Long articleId, ArticleRequest articleRequest, Long userId);
 }

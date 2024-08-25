@@ -39,7 +39,7 @@ public class ArticleController {
     public ResponseEntity<ApiResponse<List<ArticleWithCategoryResponse>>> getAllArticles(
             @RequestParam(defaultValue = "0") int pageNo,
             @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "articleId") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection) {
 
         List<String> validSortFields = List.of("articleId", "title", "description", "createdAt", "updatedAt");
@@ -52,6 +52,29 @@ public class ArticleController {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(direction, sortBy));
         ApiResponse<List<ArticleWithCategoryResponse>> response = articleService.getAllArticles(pageable);
 
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @GetMapping("/articles/{id}")
+    public ResponseEntity<ApiResponse<ArticleWithCategoryResponse>> findArticleById(@PathVariable Long id) {
+        ApiResponse<ArticleWithCategoryResponse> response = articleService.findArticleById(id);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @DeleteMapping("/articles/author/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteArticle(@PathVariable Long id) {
+        ApiResponse<Void> response = articleService.deleteArticle(id);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @PutMapping("/articles/{id}")
+    public ResponseEntity<ApiResponse<ArticleResponse>> updateArticle(
+            @PathVariable Long id,
+            @Valid @RequestBody ArticleRequest articleRequest,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+
+        Long userId = customUserDetails.getId();
+        ApiResponse<ArticleResponse> response = articleService.updateArticle(id, articleRequest, userId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }

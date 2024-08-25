@@ -1,5 +1,6 @@
 package com.homework.spring_mini_project_001_group6.service.serviceimp;
 
+import com.homework.spring_mini_project_001_group6.exception.InvalidDataException;
 import com.homework.spring_mini_project_001_group6.exception.SearchNotFoundException;
 import com.homework.spring_mini_project_001_group6.model.dto.requestbody.ArticleRequest;
 import com.homework.spring_mini_project_001_group6.model.dto.response.ApiResponse;
@@ -39,6 +40,11 @@ public class ArticleServiceImp implements ArticleService {
     public ApiResponse<ArticleResponse> createArticle(ArticleRequest articleRequest, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Check for duplicate category IDs in the input list
+        if (articleRequest.getCategoryIds().stream().distinct().count() != articleRequest.getCategoryIds().size()) {
+            throw new InvalidDataException("Duplicate category IDs are not allowed");
+        }
 
         Article article = new Article();
         article.setTitle(articleRequest.getTitle());
@@ -98,5 +104,83 @@ public class ArticleServiceImp implements ArticleService {
         }).collect(Collectors.toList());
 
         return new ApiResponse<>("Articles fetched successfully", HttpStatus.OK, articleResponses);
+    }
+
+    @Override
+    public ApiResponse<ArticleWithCategoryResponse> findArticleById(Long articleId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new SearchNotFoundException("Article with ID " + articleId + " not found"));
+
+        List<Long> categoryIds = article.getCategoryArticles().stream()
+                .map(categoryArticle -> categoryArticle.getCategory().getCategoryId())
+                .collect(Collectors.toList());
+
+        ArticleWithCategoryResponse articleResponse = new ArticleWithCategoryResponse(
+                article.getArticleId(),
+                article.getTitle(),
+                article.getDescription(),
+                article.getCreatedAt(),
+                article.getUser().getUserId(),
+                categoryIds
+        );
+
+        return new ApiResponse<>("Article fetched successfully", HttpStatus.OK, articleResponse);
+    }
+
+    @Override
+    public ApiResponse<Void> deleteArticle(Long articleId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new SearchNotFoundException("Article with ID " + articleId + " not found"));
+
+        articleRepository.delete(article);
+        return new ApiResponse<>("Article deleted successfully", HttpStatus.OK, null);
+    }
+
+    @Override
+    public ApiResponse<ArticleResponse> updateArticle(Long articleId, ArticleRequest articleRequest, Long userId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new SearchNotFoundException("Article with ID " + articleId + " not found"));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Check for duplicate category IDs in the input list
+        if (articleRequest.getCategoryIds().stream().distinct().count() != articleRequest.getCategoryIds().size()) {
+            throw new InvalidDataException("Duplicate category IDs are not allowed");
+        }
+
+        // Update the article's fields
+        article.setTitle(articleRequest.getTitle());
+        article.setDescription(articleRequest.getDescription());
+        article.setUser(user);
+
+        // Clear existing category articles
+        article.getCategoryArticles().clear();
+
+        // Re-add categories to the article
+        List<CategoryArticle> categoryArticles = new ArrayList<>();
+        for (Long categoryId : articleRequest.getCategoryIds()) {
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new SearchNotFoundException("Category with ID " + categoryId + " not found"));
+
+            CategoryArticle categoryArticle = new CategoryArticle();
+            categoryArticle.setArticle(article);
+            categoryArticle.setCategory(category);
+            categoryArticles.add(categoryArticle);
+        }
+
+        article.setCategoryArticles(categoryArticles);
+        articleRepository.save(article);
+
+        // Prepare response
+        ArticleResponse articleResponse = new ArticleResponse(
+                article.getArticleId(),
+                article.getTitle(),
+                article.getDescription(),
+                article.getCreatedAt(),
+                article.getUser().getUserId()
+        );
+
+        return new ApiResponse<>("Article updated successfully", HttpStatus.OK, articleResponse);
     }
 }
