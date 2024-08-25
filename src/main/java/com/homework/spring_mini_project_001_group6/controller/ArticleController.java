@@ -3,14 +3,12 @@ package com.homework.spring_mini_project_001_group6.controller;
 import com.homework.spring_mini_project_001_group6.exception.InvalidDataException;
 import com.homework.spring_mini_project_001_group6.model.CustomUserDetails;
 import com.homework.spring_mini_project_001_group6.model.dto.requestbody.ArticleRequest;
-import com.homework.spring_mini_project_001_group6.model.dto.response.ApiResponse;
-import com.homework.spring_mini_project_001_group6.model.dto.response.ArticleResponse;
-import com.homework.spring_mini_project_001_group6.model.dto.response.ArticleWithCategoryResponse;
+import com.homework.spring_mini_project_001_group6.model.dto.requestbody.CommentRequest;
+import com.homework.spring_mini_project_001_group6.model.dto.response.*;
 import com.homework.spring_mini_project_001_group6.service.ArticleService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -61,20 +59,37 @@ public class ArticleController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @DeleteMapping("/articles/author/{id}")
+    @DeleteMapping("/author/articles/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteArticle(@PathVariable Long id) {
         ApiResponse<Void> response = articleService.deleteArticle(id);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @PutMapping("/articles/{id}")
-    public ResponseEntity<ApiResponse<ArticleResponse>> updateArticle(
+    @PutMapping("/author/articles/{id}")
+    public ResponseEntity<ApiResponse<UpdateArticleResponse>> updateArticle(
             @PathVariable Long id,
             @Valid @RequestBody ArticleRequest articleRequest,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
         Long userId = customUserDetails.getId();
-        ApiResponse<ArticleResponse> response = articleService.updateArticle(id, articleRequest, userId);
+        ApiResponse<UpdateArticleResponse> response = articleService.updateArticle(id, articleRequest, userId);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @PostMapping("/articles/{id}/comments")
+    public ResponseEntity<ApiResponse<UpdateArticleResponse>> postComment(
+            @PathVariable Long id,
+            @Valid @RequestBody CommentRequest commentRequest,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+
+        Long userId = customUserDetails.getId();
+        ApiResponse<UpdateArticleResponse> response = articleService.postComment(id, commentRequest, userId);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @GetMapping("/articles/{id}/comments")
+    public ResponseEntity<ApiResponse<List<CommentResponse>>> findAllCommentsByArticleId(@PathVariable Long id) {
+        ApiResponse<List<CommentResponse>> response = articleService.findAllCommentsByArticleId(id);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }

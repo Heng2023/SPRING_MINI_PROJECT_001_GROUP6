@@ -11,8 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class CategoryRequest {
-    @NotBlank(message = "category cannot be blank")
-    @Pattern(regexp = "^[^\\s].*$", message = "Category name cannot have leading spaces")
-    private String categoryName;
+public class CommentRequest {
+    @NotBlank(message = "Comment cannot be blank")
+    @Pattern(regexp = "^[^\\s].*$", message = "Comment cannot have leading spaces")
+    private String comment;
 }

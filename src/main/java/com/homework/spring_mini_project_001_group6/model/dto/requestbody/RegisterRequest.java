@@ -37,6 +37,7 @@ public class RegisterRequest {
     @NotBlank(message = "Phone number cannot be blank")
     @Pattern(regexp = "^\\d{3}[- ]\\d{3}[- ]\\d{3}$", message = "Phone number should be in the format 012-333-222 or 012 333 222")
     @Size(min = 3, max = 15, message = "Phone number must be between 3 and 15 characters long")
+    @Pattern(regexp = "^[^\\s].*$", message = "Phone number cannot have leading spaces")
     private String phoneNumber;
 
     @NotBlank(message = "Password cannot be blank")

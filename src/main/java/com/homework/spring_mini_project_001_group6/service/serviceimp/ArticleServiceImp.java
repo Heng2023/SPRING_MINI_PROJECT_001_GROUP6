@@ -3,15 +3,12 @@ package com.homework.spring_mini_project_001_group6.service.serviceimp;
 import com.homework.spring_mini_project_001_group6.exception.InvalidDataException;
 import com.homework.spring_mini_project_001_group6.exception.SearchNotFoundException;
 import com.homework.spring_mini_project_001_group6.model.dto.requestbody.ArticleRequest;
-import com.homework.spring_mini_project_001_group6.model.dto.response.ApiResponse;
-import com.homework.spring_mini_project_001_group6.model.dto.response.ArticleResponse;
-import com.homework.spring_mini_project_001_group6.model.dto.response.ArticleWithCategoryResponse;
-import com.homework.spring_mini_project_001_group6.model.entity.Article;
-import com.homework.spring_mini_project_001_group6.model.entity.Category;
-import com.homework.spring_mini_project_001_group6.model.entity.CategoryArticle;
-import com.homework.spring_mini_project_001_group6.model.entity.User;
+import com.homework.spring_mini_project_001_group6.model.dto.requestbody.CommentRequest;
+import com.homework.spring_mini_project_001_group6.model.dto.response.*;
+import com.homework.spring_mini_project_001_group6.model.entity.*;
 import com.homework.spring_mini_project_001_group6.repository.ArticleRepository;
 import com.homework.spring_mini_project_001_group6.repository.CategoryRepository;
+import com.homework.spring_mini_project_001_group6.repository.CommentRepository;
 import com.homework.spring_mini_project_001_group6.repository.UserRepository;
 import com.homework.spring_mini_project_001_group6.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,7 +134,7 @@ public class ArticleServiceImp implements ArticleService {
     }
 
     @Override
-    public ApiResponse<ArticleResponse> updateArticle(Long articleId, ArticleRequest articleRequest, Long userId) {
+    public ApiResponse<UpdateArticleResponse> updateArticle(Long articleId, ArticleRequest articleRequest, Long userId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new SearchNotFoundException("Article with ID " + articleId + " not found"));
 
@@ -172,15 +169,124 @@ public class ArticleServiceImp implements ArticleService {
         article.setCategoryArticles(categoryArticles);
         articleRepository.save(article);
 
+        // Prepare category ID list
+        List<Long> categoryIdList = categoryArticles.stream()
+                .map(categoryArticle -> categoryArticle.getCategory().getCategoryId())
+                .collect(Collectors.toList());
+
+        // Prepare comment list
+        List<CommentResponse> commentResponses = article.getComments().stream().map(comment -> {
+            User commentUser = comment.getUser();
+            return new CommentResponse(
+                    comment.getCommentId(),
+                    comment.getCmt(),
+                    comment.getCreatedAt(),
+                    new UserResponse(
+                            commentUser.getUserId(),
+                            commentUser.getUsername(),
+                            commentUser.getEmail(),
+                            commentUser.getAddress(),
+                            commentUser.getPhoneNumber(),
+                            commentUser.getCreatedAt(),
+                            commentUser.getRole()
+                    )
+            );
+        }).collect(Collectors.toList());
+
         // Prepare response
-        ArticleResponse articleResponse = new ArticleResponse(
+        UpdateArticleResponse articleResponse = new UpdateArticleResponse(
                 article.getArticleId(),
                 article.getTitle(),
                 article.getDescription(),
                 article.getCreatedAt(),
-                article.getUser().getUserId()
+                article.getUser().getUserId(),
+                categoryIdList,
+                article.getUpdatedAt(),
+                commentResponses
         );
 
         return new ApiResponse<>("Article updated successfully", HttpStatus.OK, articleResponse);
+    }
+
+    @Override
+    public ApiResponse<UpdateArticleResponse> postComment(Long articleId, CommentRequest commentRequest, Long userId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new SearchNotFoundException("Article with ID " + articleId + " not found"));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Create and save the new comment
+        Comment comment = new Comment();
+        comment.setCmt(commentRequest.getComment());
+        comment.setUser(user);
+        comment.setArticle(article);
+        article.getComments().add(comment);
+
+        articleRepository.save(article);
+
+        // Prepare category ID list
+        List<Long> categoryIdList = article.getCategoryArticles().stream()
+                .map(categoryArticle -> categoryArticle.getCategory().getCategoryId())
+                .collect(Collectors.toList());
+
+        // Prepare comment list
+        List<CommentResponse> commentResponses = article.getComments().stream().map(cmt -> {
+            User commentUser = cmt.getUser();
+            return new CommentResponse(
+                    cmt.getCommentId(),
+                    cmt.getCmt(),
+                    cmt.getCreatedAt(),
+                    new UserResponse(
+                            commentUser.getUserId(),
+                            commentUser.getUsername(),
+                            commentUser.getEmail(),
+                            commentUser.getAddress(),
+                            commentUser.getPhoneNumber(),
+                            commentUser.getCreatedAt(),
+                            commentUser.getRole()
+                    )
+            );
+        }).collect(Collectors.toList());
+
+        // Prepare response
+        UpdateArticleResponse articleResponse = new UpdateArticleResponse(
+                article.getArticleId(),
+                article.getTitle(),
+                article.getDescription(),
+                article.getCreatedAt(),
+                article.getUser().getUserId(),
+                categoryIdList,
+                article.getUpdatedAt(),
+                commentResponses
+        );
+
+        return new ApiResponse<>("A new comment is posted on article " + articleId + " by user " + userId, HttpStatus.CREATED, articleResponse);
+    }
+
+    @Override
+    public ApiResponse<List<CommentResponse>> findAllCommentsByArticleId(Long articleId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new SearchNotFoundException("Article with ID " + articleId + " not found"));
+
+        List<CommentResponse> commentResponses = article.getComments().stream().map(comment -> {
+            User commentUser = comment.getUser();
+            return new CommentResponse(
+                    comment.getCommentId(),
+                    comment.getCmt(),
+                    comment.getCreatedAt(),
+                    new UserResponse(
+                            commentUser.getUserId(),
+                            commentUser.getUsername(),
+                            commentUser.getEmail(),
+                            commentUser.getAddress(),
+                            commentUser.getPhoneNumber(),
+                            commentUser.getCreatedAt(),
+                            commentUser.getRole()
+                    )
+            );
+        }).collect(Collectors.toList());
+
+        return new ApiResponse<>("Comments fetched successfully for article " + articleId, HttpStatus.OK, commentResponses);
     }
 }
