@@ -4,10 +4,24 @@
   "address": "phnom penh",
   "phoneNumber": "016 857 577",
   "password": "Pav680016!",
-  "role": "AUTHOR"
+  "role": "READER"
 }
 
 {
   "email": "sokheng.tey03@gmail.com",
+  "password": "Pav680016!"
+}
+
+{
+  "username": "heng1",
+  "email": "sokheng.tey04@gmail.com",
+  "address": "phnom penh",
+  "phoneNumber": "016 857 577",
+  "password": "Pav680016!",
+  "role": "AUTHOR"
+}
+
+{
+  "email": "sokheng.tey04@gmail.com",
   "password": "Pav680016!"
 }

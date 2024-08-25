@@ -1,8 +1,10 @@
 package com.homework.spring_mini_project_001_group6.service.serviceimp;
 
+import com.homework.spring_mini_project_001_group6.exception.SearchNotFoundException;
 import com.homework.spring_mini_project_001_group6.model.dto.requestbody.ArticleRequest;
 import com.homework.spring_mini_project_001_group6.model.dto.response.ApiResponse;
 import com.homework.spring_mini_project_001_group6.model.dto.response.ArticleResponse;
+import com.homework.spring_mini_project_001_group6.model.dto.response.ArticleWithCategoryResponse;
 import com.homework.spring_mini_project_001_group6.model.entity.Article;
 import com.homework.spring_mini_project_001_group6.model.entity.Category;
 import com.homework.spring_mini_project_001_group6.model.entity.CategoryArticle;
@@ -12,11 +14,14 @@ import com.homework.spring_mini_project_001_group6.repository.CategoryRepository
 import com.homework.spring_mini_project_001_group6.repository.UserRepository;
 import com.homework.spring_mini_project_001_group6.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ArticleServiceImp implements ArticleService {
@@ -43,7 +48,7 @@ public class ArticleServiceImp implements ArticleService {
         List<CategoryArticle> categoryArticles = new ArrayList<>();
         for (Long categoryId : articleRequest.getCategoryIds()) {
             Category category = categoryRepository.findById(categoryId)
-                    .orElseThrow(() -> new RuntimeException("Category not found"));
+                    .orElseThrow(() -> new SearchNotFoundException("Category with ID " + categoryId + " not found"));
 
             // Increment the amount of articles in the category
             category.setAmountOfArticles(category.getAmountOfArticles() + 1);
@@ -67,5 +72,31 @@ public class ArticleServiceImp implements ArticleService {
         );
 
         return new ApiResponse<>("A new article is created successfully.", HttpStatus.CREATED, articleResponse);
+    }
+
+    @Override
+    public ApiResponse<List<ArticleWithCategoryResponse>> getAllArticles(Pageable pageable) {
+        Page<Article> articlesPage = articleRepository.findAll(pageable);
+
+        if (articlesPage.isEmpty()) {
+            throw new SearchNotFoundException("No articles found");
+        }
+
+        List<ArticleWithCategoryResponse> articleResponses = articlesPage.stream().map(article -> {
+            List<Long> categoryIds = article.getCategoryArticles().stream()
+                .map(categoryArticle -> categoryArticle.getCategory().getCategoryId())
+                .collect(Collectors.toList());
+
+            return new ArticleWithCategoryResponse(
+                    article.getArticleId(),
+                    article.getTitle(),
+                    article.getDescription(),
+                    article.getCreatedAt(),
+                    article.getUser().getUserId(),
+                    categoryIds // Populate the category ID list
+            );
+        }).collect(Collectors.toList());
+
+        return new ApiResponse<>("Articles fetched successfully", HttpStatus.OK, articleResponses);
     }
 }

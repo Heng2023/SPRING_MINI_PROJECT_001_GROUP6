@@ -1,5 +1,6 @@
 package com.homework.spring_mini_project_001_group6.service.serviceimp;
 
+import com.homework.spring_mini_project_001_group6.exception.InvalidDataException;
 import com.homework.spring_mini_project_001_group6.model.dto.requestbody.CategoryRequest;
 import com.homework.spring_mini_project_001_group6.model.dto.response.ApiResponse;
 import com.homework.spring_mini_project_001_group6.model.dto.response.CategoryResponse;
@@ -24,6 +25,11 @@ public class CategoryServiceImp implements CategoryService {
    @Override
     public ApiResponse<CategoryResponse> createCategory(CategoryRequest categoryRequest, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        categoryRepository.findByCategoryNameAndUser_UserId(categoryRequest.getCategoryName(), userId)
+                .ifPresent(category -> {
+                    throw new InvalidDataException("Duplicate category name: " + categoryRequest.getCategoryName());
+                });
 
         Category category = new Category();
         category.setCategoryName(categoryRequest.getCategoryName());
