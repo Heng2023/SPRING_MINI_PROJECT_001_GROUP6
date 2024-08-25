@@ -1,5 +1,6 @@
 package com.homework.spring_mini_project_001_group6.service;
 
+import com.homework.spring_mini_project_001_group6.exception.InvalidDataException;
 import com.homework.spring_mini_project_001_group6.model.CustomUserDetails;
 import com.homework.spring_mini_project_001_group6.model.entity.User;
 import com.homework.spring_mini_project_001_group6.repository.UserRepository;
@@ -7,6 +8,7 @@ import com.homework.spring_mini_project_001_group6.model.dto.requestbody.JwtRequ
 import com.homework.spring_mini_project_001_group6.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -33,9 +35,25 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new CustomUserDetails(user);
     }
 
-    public String authenticateAndGetToken(JwtRequest jwtRequest) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(jwtRequest.getEmail(), jwtRequest.getPassword()));
-        UserDetails userDetails = loadUserByUsername(jwtRequest.getEmail());
+     public String authenticateAndGetToken(JwtRequest jwtRequest) {
+        // First, check if the user exists
+        UserDetails userDetails;
+        try {
+            userDetails = loadUserByUsername(jwtRequest.getEmail());
+        } catch (UsernameNotFoundException e) {
+            throw new UsernameNotFoundException("Email not found");
+        }
+
+        // Manually authenticate the user
+        try {
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(jwtRequest.getEmail(), jwtRequest.getPassword());
+            authenticationManager.authenticate(authenticationToken);
+        } catch (BadCredentialsException e) {
+            throw new InvalidDataException("Incorrect password");
+        }
+
+        // If authentication is successful, generate the token
         return jwtUtil.generateToken(userDetails);
     }
 }

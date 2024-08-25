@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -33,13 +34,14 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())  // Disable CSRF for APIs using JWT
                 .authorizeHttpRequests(auth -> auth
-                        // Permit access to Swagger UI and API docs
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()  // Public access to Swagger UI and API docs
                         .requestMatchers("/api/v1/auth/**").permitAll()  // Allow public access to auth endpoints
-                        .requestMatchers("/api/v1/author/**").hasRole("AUTHOR")  // Allow only users with AUTHOR role
+                        .requestMatchers("/api/v1/author/**").hasRole("AUTHOR")  // Only users with AUTHOR role can access
+                        .requestMatchers("/api/v1/user/**").hasAnyRole("READER", "AUTHOR")  // Allow both READER and AUTHOR roles to access
                         .anyRequest().authenticated()  // Require authentication for all other requests
                 )
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);  // Add JWT filter
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Make the session stateless
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);  // Add JWT filter before the authentication filter
 
         return http.build();
     }
