@@ -3,11 +3,15 @@ package com.homework.spring_mini_project_001_group6.service;
 import com.homework.spring_mini_project_001_group6.model.dto.requestbody.ArticleRequest;
 import com.homework.spring_mini_project_001_group6.model.dto.requestbody.CommentRequest;
 import com.homework.spring_mini_project_001_group6.model.dto.response.*;
+import com.homework.spring_mini_project_001_group6.model.entity.Bookmark;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ArticleService {
+
+
     ApiResponse<ArticleResponse> createArticle(ArticleRequest articleRequest, Long userId);
 
     ApiResponse<List<ArticleWithCategoryResponse>> getAllArticles(Pageable pageable);
