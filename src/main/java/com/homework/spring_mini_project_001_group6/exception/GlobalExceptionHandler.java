@@ -81,10 +81,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseBody
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        String errorMessage = "Invalid data format: Ensure that all data is correctly formatted.";
+
+        Throwable cause = ex.getCause();
+
+        if (cause instanceof IllegalArgumentException) {
+            if (ex.getMessage().contains("Role")) {
+                errorMessage = "Invalid role value: Ensure the role is either 'AUTHOR' or 'READER'.";
+            }
+        }
+
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                List.of("Ids need to be numeric")
+                List.of(errorMessage)
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
