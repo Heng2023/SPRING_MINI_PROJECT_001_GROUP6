@@ -1,9 +1,7 @@
 package com.homework.spring_mini_project_001_group6.model.dto.requestbody;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import com.homework.spring_mini_project_001_group6.util.CustomDescriptionConstraint;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,9 +19,10 @@ public class ArticleRequest {
     @Pattern(regexp = "^[^\\s].*$", message = "Title cannot have leading spaces")
     private String title;
 
-    @Pattern(regexp = "^[^\\s].*$", message = "Description cannot have leading spaces")
+    @NotNull(message = "Description cannot be null")
+    @CustomDescriptionConstraint
     private String description;
 
     @NotEmpty(message = "Category IDs cannot be empty")
-    private List<Long> categoryIds;
+    private List<@Positive(message = "Category ID must be a positive number") Long> categoryIds;
 }

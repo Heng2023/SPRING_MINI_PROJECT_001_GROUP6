@@ -3,7 +3,6 @@ package com.homework.spring_mini_project_001_group6.controller;
 import com.homework.spring_mini_project_001_group6.exception.SearchNotFoundException;
 import com.homework.spring_mini_project_001_group6.model.dto.requestbody.RegisterRequest;
 import com.homework.spring_mini_project_001_group6.model.dto.response.ApiResponse;
-import com.homework.spring_mini_project_001_group6.model.dto.response.UpdateUserResponse;
 import com.homework.spring_mini_project_001_group6.model.dto.response.UserResponse;
 import com.homework.spring_mini_project_001_group6.model.entity.User;
 import com.homework.spring_mini_project_001_group6.service.UserService;
@@ -49,9 +48,9 @@ public class UserController {
 
         User user = userService.findUserByEmail(email);
 
-        UpdateUserResponse updateUserResponse = userService.updateUser(user.getUserId(), userRequest);
+        UserResponse updateUserResponse = userService.updateUser(user.getUserId(), userRequest);
 
-        ApiResponse<UpdateUserResponse> response = new ApiResponse<>(
+        ApiResponse<UserResponse> response = new ApiResponse<>(
                 "User profile updated successfully.",
                 HttpStatus.OK,
                 updateUserResponse
