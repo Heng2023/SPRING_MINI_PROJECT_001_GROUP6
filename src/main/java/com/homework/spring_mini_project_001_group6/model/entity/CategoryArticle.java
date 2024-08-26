@@ -9,7 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
-@Entity(name = "catgory_article")
+@Entity(name = "category_article")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

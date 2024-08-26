@@ -33,7 +33,7 @@ public class CategoryServiceImp implements CategoryService {
 
         Category category = new Category();
         category.setCategoryName(categoryRequest.getCategoryName());
-        category.setUser(user);  // Set the user
+        category.setUser(user);
         category.setAmountOfArticles(0L);
         categoryRepository.save(category);
 

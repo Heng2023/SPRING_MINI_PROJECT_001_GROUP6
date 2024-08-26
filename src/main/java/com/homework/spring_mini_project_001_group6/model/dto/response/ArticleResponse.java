@@ -20,12 +20,12 @@ public class ArticleResponse {
     private LocalDateTime createdAt;
     private Long ownerOfArticle;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<Long> categoryIdList;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDateTime updatedAt;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<CommentResponse> commentList;
 }
