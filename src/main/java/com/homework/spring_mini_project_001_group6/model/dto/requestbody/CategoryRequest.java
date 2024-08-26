@@ -12,7 +12,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CategoryRequest {
-    @NotBlank(message = "category cannot be blank")
+    @NotBlank(message = "Category name cannot be blank")
     @Pattern(regexp = "^[^\\s].*$", message = "Category name cannot have leading spaces")
+    @Pattern(regexp = "^[a-zA-Z0-9 ]+$", message = "Name can not contain any special characters")
     private String categoryName;
 }
