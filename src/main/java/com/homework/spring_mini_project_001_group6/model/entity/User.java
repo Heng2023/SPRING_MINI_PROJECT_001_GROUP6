@@ -1,5 +1,6 @@
 package com.homework.spring_mini_project_001_group6.model.entity;
 
+import com.homework.spring_mini_project_001_group6.model.dto.response.UserResponse;
 import com.homework.spring_mini_project_001_group6.util.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -62,4 +63,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bookmark> bookmarkList;
+
+    static public UserResponse toUserResponse(User user) {
+        return new UserResponse(user.getUserId(), user.getUsername(), user.getEmail(), user.getAddress(), user.getPhoneNumber(), user.getCreatedAt(), user.getRole());
+
+    }
 }

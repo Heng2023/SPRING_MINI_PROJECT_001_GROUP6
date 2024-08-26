@@ -21,4 +21,5 @@ public interface ArticleService {
     ApiResponse<UpdateArticleResponse> postComment(Long articleId, CommentRequest commentRequest, Long userId);
 
     ApiResponse<List<CommentResponse>> findAllCommentsByArticleId(Long articleId);
+
 }

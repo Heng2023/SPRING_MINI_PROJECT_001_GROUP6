@@ -1,5 +1,6 @@
 package com.homework.spring_mini_project_001_group6.model.entity;
 
+import com.homework.spring_mini_project_001_group6.model.dto.response.CommentResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,4 +40,7 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "article_id", nullable = false)
     private Article article;
+    public static CommentResponse toCommentResponse(Comment comment) {
+        return new CommentResponse(comment.getCommentId(), comment.getCmt(),comment.getCreatedAt(),User.toUserResponse(comment.getUser()));
+    }
 }

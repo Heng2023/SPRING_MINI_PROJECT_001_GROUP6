@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/mini_project_db
+    url: jdbc:postgresql://localhost:5432/jpa
     username: postgres
-    password: qwas1234
+    password: rosella22
     driver-class-name: org.postgresql.Driver
 
   main:
