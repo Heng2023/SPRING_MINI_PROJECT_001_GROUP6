@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CustomDescriptionConstraint {
-    String message() default "Description cannot have leading spaces or be null";
+    String message() default "Description cannot have leading spaces";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

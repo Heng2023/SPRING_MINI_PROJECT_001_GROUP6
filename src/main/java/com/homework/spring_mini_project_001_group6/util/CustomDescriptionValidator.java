@@ -8,8 +8,8 @@ public class CustomDescriptionValidator implements ConstraintValidator<CustomDes
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         if (value == null || value.trim().isEmpty()) {
-            return false; // Null or empty strings are invalid
+            return true;
         }
-        return !value.startsWith(" "); // No leading spaces allowed
+        return !value.startsWith(" ");
     }
 }

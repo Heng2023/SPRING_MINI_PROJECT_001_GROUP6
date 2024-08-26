@@ -88,8 +88,8 @@ public class ArticleController {
     }
 
     @GetMapping("/articles/{id}/comments")
-    public ResponseEntity<ApiResponse<List<CommentResponse>>> findAllCommentsByArticleId(@PathVariable Long id) {
-        ApiResponse<List<CommentResponse>> response = articleService.findAllCommentsByArticleId(id);
+    public ResponseEntity<ApiResponse<ArticleResponse>> findAllCommentsByArticleId(@PathVariable Long id) {
+        ApiResponse<ArticleResponse> response = articleService.findAllCommentsByArticleId(id);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }

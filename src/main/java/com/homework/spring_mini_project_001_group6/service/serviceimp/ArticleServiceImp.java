@@ -86,34 +86,38 @@ public class ArticleServiceImp implements ArticleService {
         }
 
         List<ArticleResponse> articleResponses = articlesPage.stream().map(article -> {
+            List<Long> categoryIds = article.getCategoryArticles().stream()
+                .map(categoryArticle -> categoryArticle.getCategory().getCategoryId())
+                .collect(Collectors.toList());
+
             List<CommentResponse> commentResponses = article.getComments().isEmpty() ? null : article.getComments().stream().map(comment -> {
                 User commentUser = comment.getUser();
                 return new CommentResponse(
-                        comment.getCommentId(),
-                        comment.getCmt(),
-                        comment.getCreatedAt(),
-                        new UserResponse(
-                                commentUser.getUserId(),
-                                commentUser.getUsername(),
-                                commentUser.getEmail(),
-                                commentUser.getAddress(),
-                                commentUser.getPhoneNumber(),
-                                commentUser.getCreatedAt(),
-                                null,
-                                commentUser.getRole()
-                        )
+                    comment.getCommentId(),
+                    comment.getCmt(),
+                    comment.getCreatedAt(),
+                    new UserResponse(
+                        commentUser.getUserId(),
+                        commentUser.getUsername(),
+                        commentUser.getEmail(),
+                        commentUser.getAddress(),
+                        commentUser.getPhoneNumber(),
+                        commentUser.getCreatedAt(),
+                        commentUser.getUpdatedAt(),
+                        commentUser.getRole()
+                    )
                 );
             }).collect(Collectors.toList());
 
             return new ArticleResponse(
-                    article.getArticleId(),
-                    article.getTitle(),
-                    article.getDescription(),
-                    article.getCreatedAt(),
-                    article.getUser().getUserId(),
-                    null,
-                    article.getUpdatedAt(),
-                    commentResponses
+                article.getArticleId(),
+                article.getTitle(),
+                article.getDescription(),
+                article.getCreatedAt(),
+                article.getUser().getUserId(),
+                categoryIds,
+                article.getUpdatedAt(),
+                commentResponses
             );
         }).collect(Collectors.toList());
 
@@ -125,34 +129,38 @@ public class ArticleServiceImp implements ArticleService {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new SearchNotFoundException("Article with ID " + articleId + " not found"));
 
+        List<Long> categoryIds = article.getCategoryArticles().stream()
+            .map(categoryArticle -> categoryArticle.getCategory().getCategoryId())
+            .collect(Collectors.toList());
+
         List<CommentResponse> commentResponses = article.getComments().isEmpty() ? null : article.getComments().stream().map(comment -> {
             User commentUser = comment.getUser();
             return new CommentResponse(
-                    comment.getCommentId(),
-                    comment.getCmt(),
-                    comment.getCreatedAt(),
-                    new UserResponse(
-                            commentUser.getUserId(),
-                            commentUser.getUsername(),
-                            commentUser.getEmail(),
-                            commentUser.getAddress(),
-                            commentUser.getPhoneNumber(),
-                            commentUser.getCreatedAt(),
-                            null,
-                            commentUser.getRole()
-                    )
+                comment.getCommentId(),
+                comment.getCmt(),
+                comment.getCreatedAt(),
+                new UserResponse(
+                    commentUser.getUserId(),
+                    commentUser.getUsername(),
+                    commentUser.getEmail(),
+                    commentUser.getAddress(),
+                    commentUser.getPhoneNumber(),
+                    commentUser.getCreatedAt(),
+                    commentUser.getUpdatedAt(),
+                    commentUser.getRole()
+                )
             );
         }).collect(Collectors.toList());
 
         ArticleResponse articleResponse = new ArticleResponse(
-                article.getArticleId(),
-                article.getTitle(),
-                article.getDescription(),
-                article.getCreatedAt(),
-                article.getUser().getUserId(),
-                null,
-                article.getUpdatedAt(),
-                commentResponses
+            article.getArticleId(),
+            article.getTitle(),
+            article.getDescription(),
+            article.getCreatedAt(),
+            article.getUser().getUserId(),
+            categoryIds,
+            article.getUpdatedAt(),
+            commentResponses
         );
 
         return new ApiResponse<>("Article fetched successfully", HttpStatus.OK, articleResponse);
@@ -189,41 +197,46 @@ public class ArticleServiceImp implements ArticleService {
 
         articleRepository.save(article);
 
+        List<Long> categoryIds = categoryArticles.stream()
+            .map(categoryArticle -> categoryArticle.getCategory().getCategoryId())
+            .collect(Collectors.toList());
+
         List<CommentResponse> commentResponses = article.getComments().stream().map(comment -> {
             User commentUser = comment.getUser();
             return new CommentResponse(
-                    comment.getCommentId(),
-                    comment.getCmt(),
-                    comment.getCreatedAt(),
-                    new UserResponse(
-                            commentUser.getUserId(),
-                            commentUser.getUsername(),
-                            commentUser.getEmail(),
-                            commentUser.getAddress(),
-                            commentUser.getPhoneNumber(),
-                            commentUser.getCreatedAt(),
-                            null,
-                            commentUser.getRole()
-                    )
+                comment.getCommentId(),
+                comment.getCmt(),
+                comment.getCreatedAt(),
+                new UserResponse(
+                    commentUser.getUserId(),
+                    commentUser.getUsername(),
+                    commentUser.getEmail(),
+                    commentUser.getAddress(),
+                    commentUser.getPhoneNumber(),
+                    commentUser.getCreatedAt(),
+                    commentUser.getUpdatedAt(),
+                    commentUser.getRole()
+                )
             );
         }).collect(Collectors.toList());
 
         ArticleResponse articleResponse = new ArticleResponse(
-                article.getArticleId(),
-                article.getTitle(),
-                article.getDescription(),
-                article.getCreatedAt(),
-                article.getUser().getUserId(),
-                null,
-                article.getUpdatedAt(),
-                commentResponses
+            article.getArticleId(),
+            article.getTitle(),
+            article.getDescription(),
+            article.getCreatedAt(),
+            article.getUser().getUserId(),
+            categoryIds,
+            article.getUpdatedAt(),
+            commentResponses
         );
 
         return new ApiResponse<>("Article updated successfully", HttpStatus.OK, articleResponse);
     }
 
-    @Override
+   @Override
     public ApiResponse<ArticleResponse> postComment(Long articleId, CommentRequest commentRequest, Long userId) {
+
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new SearchNotFoundException("Article with ID " + articleId + " not found"));
 
@@ -234,9 +247,14 @@ public class ArticleServiceImp implements ArticleService {
         comment.setCmt(commentRequest.getComment());
         comment.setUser(user);
         comment.setArticle(article);
+
         article.getComments().add(comment);
 
         articleRepository.save(article);
+
+        List<Long> categoryIds = article.getCategoryArticles().stream()
+            .map(categoryArticle -> categoryArticle.getCategory().getCategoryId())
+            .collect(Collectors.toList());
 
         List<CommentResponse> commentResponses = article.getComments().stream().map(cmt -> {
             User commentUser = cmt.getUser();
@@ -251,7 +269,7 @@ public class ArticleServiceImp implements ArticleService {
                             commentUser.getAddress(),
                             commentUser.getPhoneNumber(),
                             commentUser.getCreatedAt(),
-                            null,
+                            commentUser.getUpdatedAt(),
                             commentUser.getRole()
                     )
             );
@@ -263,7 +281,7 @@ public class ArticleServiceImp implements ArticleService {
                 article.getDescription(),
                 article.getCreatedAt(),
                 article.getUser().getUserId(),
-                null,
+                categoryIds,
                 article.getUpdatedAt(),
                 commentResponses
         );
@@ -272,9 +290,13 @@ public class ArticleServiceImp implements ArticleService {
     }
 
     @Override
-    public ApiResponse<List<CommentResponse>> findAllCommentsByArticleId(Long articleId) {
+    public ApiResponse<ArticleResponse> findAllCommentsByArticleId(Long articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new SearchNotFoundException("Article with ID " + articleId + " not found"));
+
+        List<Long> categoryIds = article.getCategoryArticles().stream()
+            .map(categoryArticle -> categoryArticle.getCategory().getCategoryId())
+            .collect(Collectors.toList());
 
         List<CommentResponse> commentResponses = article.getComments().stream().map(comment -> {
             User commentUser = comment.getUser();
@@ -289,13 +311,24 @@ public class ArticleServiceImp implements ArticleService {
                             commentUser.getAddress(),
                             commentUser.getPhoneNumber(),
                             commentUser.getCreatedAt(),
-                            null,
+                            commentUser.getUpdatedAt(),
                             commentUser.getRole()
                     )
             );
         }).collect(Collectors.toList());
 
-        return new ApiResponse<>("Comments fetched successfully for article " + articleId, HttpStatus.OK, commentResponses);
+        ArticleResponse articleResponse = new ArticleResponse(
+                article.getArticleId(),
+                article.getTitle(),
+                article.getDescription(),
+                article.getCreatedAt(),
+                article.getUser().getUserId(),
+                categoryIds,
+                article.getUpdatedAt(),
+                commentResponses
+        );
+
+        return new ApiResponse<>("Comments fetched successfully for article " + articleId, HttpStatus.OK, articleResponse);
     }
 
     @Override

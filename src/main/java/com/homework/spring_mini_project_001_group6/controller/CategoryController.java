@@ -6,6 +6,7 @@ import com.homework.spring_mini_project_001_group6.model.dto.response.ApiRespons
 import com.homework.spring_mini_project_001_group6.model.dto.response.CategoryResponse;
 import com.homework.spring_mini_project_001_group6.service.CategoryService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,7 +24,7 @@ public class CategoryController {
     private CategoryService categoryService;
 
     @PostMapping("/author/category")
-    public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(@RequestBody CategoryRequest categoryRequest,
+    public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(@Valid @RequestBody CategoryRequest categoryRequest,
                                                                         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Long userId = customUserDetails.getId();
         ApiResponse<CategoryResponse> response = categoryService.createCategory(categoryRequest, userId);

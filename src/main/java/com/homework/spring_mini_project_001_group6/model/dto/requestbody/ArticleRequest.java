@@ -19,10 +19,9 @@ public class ArticleRequest {
     @Pattern(regexp = "^[^\\s].*$", message = "Title cannot have leading spaces")
     private String title;
 
-    @NotNull(message = "Description cannot be null")
     @CustomDescriptionConstraint
     private String description;
 
     @NotEmpty(message = "Category IDs cannot be empty")
-    private List<@Positive(message = "Category ID must be a positive number") Long> categoryIds;
+    private List<@Positive(message = "Category IDs must all be positive numbers") Long> categoryIds;
 }

@@ -110,7 +110,7 @@ public class UserService {
             updatedUser.getAddress(),
             updatedUser.getPhoneNumber(),
             updatedUser.getCreatedAt(),
-            updatedUser.getUpdatedAt(),  // updatedAt is now set and returned
+            updatedUser.getUpdatedAt(),
             updatedUser.getRole()
         );
     }
