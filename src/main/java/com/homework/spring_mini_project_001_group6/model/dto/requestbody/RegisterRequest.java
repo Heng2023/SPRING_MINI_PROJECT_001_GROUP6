@@ -3,6 +3,7 @@ package com.homework.spring_mini_project_001_group6.model.dto.requestbody;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.homework.spring_mini_project_001_group6.util.Role;
 import com.homework.spring_mini_project_001_group6.util.RoleDeserializer;
+import com.homework.spring_mini_project_001_group6.util.ValidRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -46,17 +47,7 @@ public class RegisterRequest {
     @Pattern(regexp = "^[^\\s].*$", message = "Password cannot have leading spaces")
     private String password;
 
+    @ValidRole
     @JsonDeserialize(using = RoleDeserializer.class)
     private Role role;
-
-    public void setRole(Role role) {
-        if (role != null) {
-            String roleName = role.name().toUpperCase();
-            if (roleName.equals("AUTHOR") || roleName.equals("READER")) {
-                this.role = Role.valueOf(roleName);
-            } else {
-                throw new IllegalArgumentException("Role must be either AUTHOR or READER");
-            }
-        }
-    }
 }

@@ -34,11 +34,11 @@ public class ArticleController {
     }
 
     @GetMapping("/articles/all")
-    public ResponseEntity<ApiResponse<List<ArticleWithCategoryResponse>>> getAllArticles(
+    public ResponseEntity<ApiResponse<List<ArticleResponse>>> getAllArticles(
             @RequestParam(defaultValue = "0") int pageNo,
             @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(defaultValue = "articleId") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDirection) {
+            @RequestParam(defaultValue = "ASC") String sortDirection) {
 
         List<String> validSortFields = List.of("articleId", "title", "description", "createdAt", "updatedAt");
 
@@ -48,14 +48,14 @@ public class ArticleController {
 
         Sort.Direction direction = Sort.Direction.fromString(sortDirection.toUpperCase());
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(direction, sortBy));
-        ApiResponse<List<ArticleWithCategoryResponse>> response = articleService.getAllArticles(pageable);
+        ApiResponse<List<ArticleResponse>> response = articleService.getAllArticles(pageable);
 
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     @GetMapping("/articles/{id}")
-    public ResponseEntity<ApiResponse<ArticleWithCategoryResponse>> findArticleById(@PathVariable Long id) {
-        ApiResponse<ArticleWithCategoryResponse> response = articleService.findArticleById(id);
+    public ResponseEntity<ApiResponse<ArticleResponse>> findArticleById(@PathVariable Long id) {
+        ApiResponse<ArticleResponse> response = articleService.findArticleById(id);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -66,30 +66,30 @@ public class ArticleController {
     }
 
     @PutMapping("/author/articles/{id}")
-    public ResponseEntity<ApiResponse<UpdateArticleResponse>> updateArticle(
+    public ResponseEntity<ApiResponse<ArticleResponse>> updateArticle(
             @PathVariable Long id,
             @Valid @RequestBody ArticleRequest articleRequest,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
         Long userId = customUserDetails.getId();
-        ApiResponse<UpdateArticleResponse> response = articleService.updateArticle(id, articleRequest, userId);
+        ApiResponse<ArticleResponse> response = articleService.updateArticle(id, articleRequest, userId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     @PostMapping("/articles/{id}/comments")
-    public ResponseEntity<ApiResponse<UpdateArticleResponse>> postComment(
+    public ResponseEntity<ApiResponse<ArticleResponse>> postComment(
             @PathVariable Long id,
             @Valid @RequestBody CommentRequest commentRequest,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
         Long userId = customUserDetails.getId();
-        ApiResponse<UpdateArticleResponse> response = articleService.postComment(id, commentRequest, userId);
+        ApiResponse<ArticleResponse> response = articleService.postComment(id, commentRequest, userId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     @GetMapping("/articles/{id}/comments")
-    public ResponseEntity<ApiResponse<List<CommentResponse>>> findAllCommentsByArticleId(@PathVariable Long id) {
-        ApiResponse<List<CommentResponse>> response = articleService.findAllCommentsByArticleId(id);
+    public ResponseEntity<ApiResponse<ArticleResponse>> findAllCommentsByArticleId(@PathVariable Long id) {
+        ApiResponse<ArticleResponse> response = articleService.findAllCommentsByArticleId(id);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }

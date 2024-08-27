@@ -8,18 +8,18 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface ArticleService {
+
     ApiResponse<ArticleResponse> createArticle(ArticleRequest articleRequest, Long userId);
 
-    ApiResponse<List<ArticleWithCategoryResponse>> getAllArticles(Pageable pageable);
+    ApiResponse<List<ArticleResponse>> getAllArticles(Pageable pageable);
 
-    ApiResponse<ArticleWithCategoryResponse> findArticleById(Long articleId);
+    ApiResponse<ArticleResponse> findArticleById(Long articleId);
 
     ApiResponse<Void> deleteArticle(Long articleId);
 
-    ApiResponse<UpdateArticleResponse> updateArticle(Long articleId, ArticleRequest articleRequest, Long userId);
+    ApiResponse<ArticleResponse> updateArticle(Long articleId, ArticleRequest articleRequest, Long userId);
 
-    ApiResponse<UpdateArticleResponse> postComment(Long articleId, CommentRequest commentRequest, Long userId);
+    ApiResponse<ArticleResponse> postComment(Long articleId, CommentRequest commentRequest, Long userId);
 
-    ApiResponse<List<CommentResponse>> findAllCommentsByArticleId(Long articleId);
-
+    ApiResponse<ArticleResponse> findAllCommentsByArticleId(Long articleId);
 }

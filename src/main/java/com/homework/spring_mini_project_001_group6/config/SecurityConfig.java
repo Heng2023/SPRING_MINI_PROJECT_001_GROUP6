@@ -1,5 +1,6 @@
 package com.homework.spring_mini_project_001_group6.config;
 
+import com.homework.spring_mini_project_001_group6.security.JwtAuthEntrypoint;
 import com.homework.spring_mini_project_001_group6.security.JwtRequestFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtRequestFilter jwtRequestFilter;
+    private final JwtAuthEntrypoint jwtAuthEntrypoint;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -32,16 +34,22 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())  // Disable CSRF for APIs using JWT
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()  // Public access to Swagger UI and API docs
-                        .requestMatchers("/api/v1/auth/**").permitAll()  // Allow public access to auth endpoints
-                        .requestMatchers("/api/v1/author/**").hasRole("AUTHOR")  // Only users with AUTHOR role can access
-                        .requestMatchers("/api/v1/user/**").hasAnyRole("READER", "AUTHOR")  // Allow both READER and AUTHOR roles to access
-                        .anyRequest().authenticated()  // Require authentication for all other requests
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/author/**").hasRole("AUTHOR")
+                        .requestMatchers("/api/v1/user/**").hasAnyRole("READER", "AUTHOR")
+                        .requestMatchers("/api/v1/bookmark/**").hasAnyRole("READER", "AUTHOR")
+                        .requestMatchers("/api/v1/comment/**").hasAnyRole("READER", "AUTHOR")
+                        .requestMatchers("/api/v1/article/**").hasAnyRole("READER", "AUTHOR")
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(jwtAuthEntrypoint) // Configure the custom entry point for 401
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Make the session stateless
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);  // Add JWT filter before the authentication filter
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);  // Add the JWT filter
 
         return http.build();
     }

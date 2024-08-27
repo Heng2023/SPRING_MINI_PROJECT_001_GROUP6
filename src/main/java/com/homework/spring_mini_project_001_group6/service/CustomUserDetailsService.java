@@ -36,7 +36,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
      public String authenticateAndGetToken(JwtRequest jwtRequest) {
-        // First, check if the user exists
         UserDetails userDetails;
         try {
             userDetails = loadUserByUsername(jwtRequest.getEmail());
@@ -44,7 +43,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Email not found");
         }
 
-        // Manually authenticate the user
         try {
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(jwtRequest.getEmail(), jwtRequest.getPassword());
@@ -53,7 +51,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new InvalidDataException("Incorrect password");
         }
 
-        // If authentication is successful, generate the token
         return jwtUtil.generateToken(userDetails);
     }
 }

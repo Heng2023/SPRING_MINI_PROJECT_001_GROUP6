@@ -3,13 +3,14 @@ package com.homework.spring_mini_project_001_group6.service;
 import com.homework.spring_mini_project_001_group6.exception.InvalidDataException;
 import com.homework.spring_mini_project_001_group6.exception.SearchNotFoundException;
 import com.homework.spring_mini_project_001_group6.model.dto.requestbody.RegisterRequest;
-import com.homework.spring_mini_project_001_group6.model.dto.response.UpdateUserResponse;
 import com.homework.spring_mini_project_001_group6.model.dto.response.UserResponse;
 import com.homework.spring_mini_project_001_group6.model.entity.User;
 import com.homework.spring_mini_project_001_group6.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 public class UserService {
@@ -50,6 +51,7 @@ public class UserService {
             user.getAddress(),
             user.getPhoneNumber(),
             user.getCreatedAt(),
+            null,
             user.getRole()
         );
     }
@@ -70,11 +72,12 @@ public class UserService {
                 user.getAddress(),
                 user.getPhoneNumber(),
                 user.getCreatedAt(),
+                user.getUpdatedAt(),
                 user.getRole()
         );
     }
 
-    public UpdateUserResponse updateUser(Long userId, RegisterRequest userRequest) throws SearchNotFoundException {
+    public UserResponse updateUser(Long userId, RegisterRequest userRequest) throws SearchNotFoundException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new SearchNotFoundException("User not found with id: " + userId));
 
@@ -96,9 +99,11 @@ public class UserService {
 
         user.setRole(userRequest.getRole());
 
+        user.setUpdatedAt(LocalDateTime.now());
+
         User updatedUser = userRepository.save(user);
 
-        return new UpdateUserResponse(
+        return new UserResponse(
             updatedUser.getUserId(),
             updatedUser.getUsername(),
             updatedUser.getEmail(),
