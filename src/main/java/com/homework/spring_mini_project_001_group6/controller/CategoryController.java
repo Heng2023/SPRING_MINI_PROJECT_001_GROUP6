@@ -6,8 +6,10 @@ import com.homework.spring_mini_project_001_group6.model.dto.response.ApiRespons
 import com.homework.spring_mini_project_001_group6.model.dto.response.CategoryResponse;
 import com.homework.spring_mini_project_001_group6.service.CategoryService;
 import com.homework.spring_mini_project_001_group6.util.SortByCategoryField;
+import com.homework.spring_mini_project_001_group6.util.SortDirection;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,7 +26,7 @@ public class CategoryController {
     private CategoryService categoryService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(@RequestBody CategoryRequest categoryRequest,
+    public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(@Valid @RequestBody CategoryRequest categoryRequest,
                                                                         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Long userId = customUserDetails.getId();
         ApiResponse<CategoryResponse> response = categoryService.createCategory(categoryRequest, userId);
@@ -35,29 +37,29 @@ public class CategoryController {
                                                                               @RequestParam(defaultValue = "0")  int pageNo,
                                                                               @RequestParam(defaultValue = "10")   int pageSize,
                                                                               SortByCategoryField sortBy,
-                                                                              @RequestParam(defaultValue = "asc") String sortDirection  ) {
+                                                                              SortDirection sortDirection ) {
         Long userId = customUserDetails.getId();
         ApiResponse<List<CategoryResponse>> response = categoryService.findAll(pageNo,pageSize,sortBy,sortDirection,userId);
         return new ResponseEntity<>(response,response.getStatus());
     }
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<CategoryResponse>> getCategoryById(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<ApiResponse<CategoryResponse>> getCategoryById(@PathVariable  Long id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         ApiResponse<CategoryResponse> response = categoryService.findById(id,customUserDetails.getId());
         return new ResponseEntity<>(response,response.getStatus());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<CategoryResponse>> updateCategoryById(@PathVariable Long id,
-                                                                            @Valid  @RequestBody CategoryRequest categoryRequest,
+    public ResponseEntity<ApiResponse<CategoryResponse>> updateCategoryById(@Positive @PathVariable int id,
+                                                                            @RequestBody CategoryRequest categoryRequest,
                                                                             @AuthenticationPrincipal CustomUserDetails customUserDetails){
 
-        ApiResponse<CategoryResponse> response = categoryService.updateCategoryById(id,categoryRequest,customUserDetails.getId());
+        ApiResponse<CategoryResponse> response = categoryService.updateCategoryById((long) id,categoryRequest,customUserDetails.getId());
         return new ResponseEntity<>(response,response.getStatus());
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<CategoryResponse>> deleteCategoryById(@PathVariable Long id,
+    public ResponseEntity<ApiResponse<CategoryResponse>> deleteCategoryById(@PathVariable  @Positive int id,
                                                                             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        ApiResponse<CategoryResponse> response = categoryService.deleteCategoryById(id,customUserDetails.getId());
+        ApiResponse<CategoryResponse> response = categoryService.deleteCategoryById((long) id,customUserDetails.getId());
         return new ResponseEntity<>(response,response.getStatus());
     }
 

@@ -10,7 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-@Entity(name = "catgory_article")
+@Entity(name = "category_article")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

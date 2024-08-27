@@ -1,5 +1,6 @@
 package com.homework.spring_mini_project_001_group6.model.entity;
 
+import com.homework.spring_mini_project_001_group6.model.dto.response.ArticleResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -45,4 +46,11 @@ public class Article {
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     private List<Comment> comments;
+
+    static public ArticleResponse toResponse(Article article) {
+        return new ArticleResponse(article.getArticleId(),
+                article.getTitle(),
+                article.getDescription(),
+                article.getCreatedAt(),article.getUser().getUserId());
+    }
 }

@@ -1,17 +1,21 @@
 package com.homework.spring_mini_project_001_group6.service.serviceimp;
 
 import com.homework.spring_mini_project_001_group6.exception.ConflictException;
-import com.homework.spring_mini_project_001_group6.exception.InvalidDataException;
 import com.homework.spring_mini_project_001_group6.exception.SearchNotFoundException;
 import com.homework.spring_mini_project_001_group6.model.dto.requestbody.CategoryRequest;
 import com.homework.spring_mini_project_001_group6.model.dto.response.ApiResponse;
+import com.homework.spring_mini_project_001_group6.model.dto.response.ArticleResponse;
 import com.homework.spring_mini_project_001_group6.model.dto.response.CategoryResponse;
+import com.homework.spring_mini_project_001_group6.model.entity.Article;
 import com.homework.spring_mini_project_001_group6.model.entity.Category;
+import com.homework.spring_mini_project_001_group6.model.entity.CategoryArticle;
 import com.homework.spring_mini_project_001_group6.model.entity.User;
+import com.homework.spring_mini_project_001_group6.repository.CategoryArticleRepository;
 import com.homework.spring_mini_project_001_group6.repository.CategoryRepository;
 import com.homework.spring_mini_project_001_group6.repository.UserRepository;
 import com.homework.spring_mini_project_001_group6.service.CategoryService;
 import com.homework.spring_mini_project_001_group6.util.SortByCategoryField;
+import com.homework.spring_mini_project_001_group6.util.SortDirection;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -27,8 +31,7 @@ public class CategoryServiceImp implements CategoryService {
 
 
     private CategoryRepository categoryRepository;
-
-
+    private CategoryArticleRepository categoryArticleRepository;
     private UserRepository userRepository;
 
    @Override
@@ -50,22 +53,25 @@ public class CategoryServiceImp implements CategoryService {
                 category.getCategoryId(),
                 category.getCategoryName(),
                 null,
-                category.getCreatedAt()
+                category.getCreatedAt(),
+                null
         );
 
         return new ApiResponse<>("A new category is created successfully.", HttpStatus.CREATED, categoryResponse);
     }
 
     @Override
-    public ApiResponse<List<CategoryResponse>> findAll(int pageNo, int pageSize, SortByCategoryField sortBy, String sortDirection,Long userId) {
-       if(sortDirection.compareToIgnoreCase("asc") !=0 & sortDirection.compareToIgnoreCase("desc") !=0) {
-           throw new InvalidDataException("Invalid sort direction");
-       }
+    public ApiResponse<List<CategoryResponse>> findAll(int pageNo, int pageSize, SortByCategoryField sortBy, SortDirection sortDirection, Long userId) {
+
+       List<Article> articleList = categoryArticleRepository.findAllByCategory_CategoryId(userId).stream().map(CategoryArticle::getArticle).toList();
+        List<ArticleResponse> articleResponseList = articleList.stream().map(Article::toResponse).toList();
         List<Category> categories = categoryRepository.findAllByUser_userId(
                 PageRequest.of(pageNo,pageSize,
-                        Sort.Direction.valueOf(sortDirection.toUpperCase()),
+                        Sort.Direction.valueOf(sortDirection.toString()),
                         String.valueOf(sortBy)),userId);
-        List<CategoryResponse> categoryResponses = categories.stream().map(Category::toCategoryResponse).toList();
+        List<CategoryResponse> categoryResponses = categories.stream()
+                .map(e->Category.toCategoryResponse(e,articleResponseList))
+        .toList();
         return  new ApiResponse<>("Get all category successfully.", HttpStatus.OK, categoryResponses);
     }
 
@@ -74,7 +80,9 @@ public class CategoryServiceImp implements CategoryService {
        Optional<Category> categoryOptional = categoryRepository.findByCategoryIdAndUser_userId(id, userId);
         if(categoryOptional.isPresent()){
             Category category = categoryOptional.get();
-            return new ApiResponse<>("Get category with id " + id + " successfully", HttpStatus.OK, Category.toCategoryResponse(category));
+            List<Article> articleList = categoryArticleRepository.findAllByCategory_CategoryId(userId).stream().map(CategoryArticle::getArticle).toList();
+            List<ArticleResponse> articleResponseList = articleList.stream().map(Article::toResponse).toList();
+            return new ApiResponse<>("Get category with id " + id + " successfully", HttpStatus.OK, Category.toCategoryResponse(category,articleResponseList));
         }
         throw new SearchNotFoundException("Category with id "+id+" is not found");
     }
@@ -91,14 +99,17 @@ public class CategoryServiceImp implements CategoryService {
                      .filter(e-> e.getCategoryId()!=null).findFirst()
                      .map(category1 -> { category1.setCategoryName(categoryRequest.getCategoryName()); return categoryRepository.save(category1); } )
                      .orElseThrow(()-> new SearchNotFoundException("Category with id "+id+" is not found"));
-             return new ApiResponse<>("Update successfully",HttpStatus.OK,Category.toCategoryResponse(category));
+        List<Article> articleList = categoryArticleRepository.findAllByCategory_CategoryId(userId).stream().map(CategoryArticle::getArticle).toList();
+        List<ArticleResponse> articleResponseList = articleList.stream().map(Article::toResponse).toList();
+
+        return new ApiResponse<>("Update successfully",HttpStatus.OK,Category.toCategoryResponse(category,articleResponseList));
     }
 
     @Override
     public ApiResponse<CategoryResponse> deleteCategoryById(Long id, Long userId) {
         categoryRepository.findByCategoryIdAndUser_userId(id, userId).stream()
                 .filter(e -> e.getCategoryId()!=null).findFirst()
-                .map(category -> { categoryRepository.delete(category); return Category.toCategoryResponse(category); } )
+                .map(category -> { categoryRepository.delete(category); return Category.toCategoryResponse(category,null); } )
                 .orElseThrow(()-> new SearchNotFoundException("Category with id "+id+" is not found"));
         return new ApiResponse<>("Category with id "+id+" is deleted",HttpStatus.OK,null);
     }

@@ -1,5 +1,6 @@
 package com.homework.spring_mini_project_001_group6.model.entity;
 
+import com.homework.spring_mini_project_001_group6.model.dto.response.ArticleResponse;
 import com.homework.spring_mini_project_001_group6.model.dto.response.CategoryResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity(name = "category")
@@ -45,7 +47,7 @@ public class Category {
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<CategoryArticle> categoryArticles;
 
-    public static CategoryResponse toCategoryResponse(Category category) {
-        return new CategoryResponse(category.getCategoryId(),category.getCategoryName(),category.amountOfArticles,category.createdAt);
+    public static CategoryResponse toCategoryResponse(Category category, List<ArticleResponse> articleResponses) {
+        return new CategoryResponse(category.getCategoryId(),category.getCategoryName(),category.amountOfArticles,category.createdAt,articleResponses);
     }
 }

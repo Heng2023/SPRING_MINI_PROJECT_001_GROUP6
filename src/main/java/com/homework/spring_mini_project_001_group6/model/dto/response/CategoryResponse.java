@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,4 +21,6 @@ public class CategoryResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long amountOfArticles;
     private LocalDateTime createdAt;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<ArticleResponse> articleList;
 }
