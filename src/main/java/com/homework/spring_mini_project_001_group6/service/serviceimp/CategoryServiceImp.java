@@ -42,13 +42,11 @@ public class CategoryServiceImp implements CategoryService {
                 .ifPresent(category -> {
                     throw new ConflictException("Duplicate category name: " + categoryRequest.getCategoryName());
                 });
-
         Category category = new Category();
         category.setCategoryName(categoryRequest.getCategoryName());
         category.setUser(user);  // Set the user
         category.setAmountOfArticles(0L);
         categoryRepository.save(category);
-
         CategoryResponse categoryResponse = new CategoryResponse(
                 category.getCategoryId(),
                 category.getCategoryName(),
@@ -56,31 +54,30 @@ public class CategoryServiceImp implements CategoryService {
                 category.getCreatedAt(),
                 null
         );
-
         return new ApiResponse<>("A new category is created successfully.", HttpStatus.CREATED, categoryResponse);
     }
 
     @Override
     public ApiResponse<List<CategoryResponse>> findAll(int pageNo, int pageSize, SortByCategoryField sortBy, SortDirection sortDirection, Long userId) {
-
-       List<Article> articleList = categoryArticleRepository.findAllByCategory_CategoryId(userId).stream().map(CategoryArticle::getArticle).toList();
-        List<ArticleResponse> articleResponseList = articleList.stream().map(Article::toResponse).toList();
-        List<Category> categories = categoryRepository.findAllByUser_userId(
+             List<Category> categories = categoryRepository.findAllByUser_userId(
                 PageRequest.of(pageNo,pageSize,
                         Sort.Direction.valueOf(sortDirection.toString()),
                         String.valueOf(sortBy)),userId);
         List<CategoryResponse> categoryResponses = categories.stream()
-                .map(e->Category.toCategoryResponse(e,articleResponseList))
+                .map(e->Category.toCategoryResponse(e,
+                        categoryArticleRepository
+                                .findAllByCategory_CategoryId(e.getCategoryId()).stream()
+                                .map(CategoryArticle::getArticle)
+                                .map(Article::toResponse).toList()))
         .toList();
         return  new ApiResponse<>("Get all category successfully.", HttpStatus.OK, categoryResponses);
     }
-
     @Override
     public ApiResponse<CategoryResponse> findById(Long id, Long userId) {
        Optional<Category> categoryOptional = categoryRepository.findByCategoryIdAndUser_userId(id, userId);
         if(categoryOptional.isPresent()){
             Category category = categoryOptional.get();
-            List<Article> articleList = categoryArticleRepository.findAllByCategory_CategoryId(userId).stream().map(CategoryArticle::getArticle).toList();
+            List<Article> articleList = categoryArticleRepository.findAllByCategory_CategoryId(id).stream().map(CategoryArticle::getArticle).toList();
             List<ArticleResponse> articleResponseList = articleList.stream().map(Article::toResponse).toList();
             return new ApiResponse<>("Get category with id " + id + " successfully", HttpStatus.OK, Category.toCategoryResponse(category,articleResponseList));
         }
@@ -99,7 +96,7 @@ public class CategoryServiceImp implements CategoryService {
                      .filter(e-> e.getCategoryId()!=null).findFirst()
                      .map(category1 -> { category1.setCategoryName(categoryRequest.getCategoryName()); return categoryRepository.save(category1); } )
                      .orElseThrow(()-> new SearchNotFoundException("Category with id "+id+" is not found"));
-        List<Article> articleList = categoryArticleRepository.findAllByCategory_CategoryId(userId).stream().map(CategoryArticle::getArticle).toList();
+        List<Article> articleList = categoryArticleRepository.findAllByCategory_CategoryId(id).stream().map(CategoryArticle::getArticle).toList();
         List<ArticleResponse> articleResponseList = articleList.stream().map(Article::toResponse).toList();
 
         return new ApiResponse<>("Update successfully",HttpStatus.OK,Category.toCategoryResponse(category,articleResponseList));
