@@ -1,13 +1,13 @@
 package com.homework.spring_mini_project_001_group6.util;
 
-public enum BookmarkField {
+public enum SortByBookmarkField {
     ARTICLE_ID("article.articleId"),
     TITLE("article.title"),
     CREATED_AT("createdAt");
 
     private final String field;
 
-    BookmarkField(String field) {
+    SortByBookmarkField(String field) {
         this.field = field;
     }
 

@@ -6,6 +6,7 @@ import com.homework.spring_mini_project_001_group6.model.dto.response.ApiRespons
 import com.homework.spring_mini_project_001_group6.model.dto.response.CategoryResponse;
 import com.homework.spring_mini_project_001_group6.service.CategoryService;
 import com.homework.spring_mini_project_001_group6.util.SortByCategoryField;
+import com.homework.spring_mini_project_001_group6.util.SortDirection;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +33,16 @@ public class CategoryController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getAllCategory(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                                              @RequestParam(defaultValue = "0")  int pageNo,
-                                                                              @RequestParam(defaultValue = "10")   int pageSize,
-                                                                              SortByCategoryField sortBy, @RequestParam(defaultValue = "ASC") String sortDirection  ) {
+    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getAllCategory(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @RequestParam(defaultValue = "0") int pageNo,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "categoryId") SortByCategoryField sortBy,
+            @RequestParam(defaultValue = "ASC") SortDirection sortDirection) {
+
         Long userId = customUserDetails.getId();
-        ApiResponse<List<CategoryResponse>> response = categoryService.findAll(pageNo,pageSize,sortBy,sortDirection,userId);
-        return new ResponseEntity<>(response,response.getStatus());
+        ApiResponse<List<CategoryResponse>> response = categoryService.findAll(pageNo, pageSize, sortBy, sortDirection, userId);
+        return new ResponseEntity<>(response, response.getStatus());
     }
 
     @GetMapping("/{id}")

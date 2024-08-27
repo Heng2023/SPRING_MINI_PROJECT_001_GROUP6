@@ -10,7 +10,8 @@ import com.homework.spring_mini_project_001_group6.repository.BookmarkRepository
 import com.homework.spring_mini_project_001_group6.repository.ArticleRepository;
 import com.homework.spring_mini_project_001_group6.repository.UserRepository;
 import com.homework.spring_mini_project_001_group6.service.BookmarkService;
-import com.homework.spring_mini_project_001_group6.util.BookmarkField;
+import com.homework.spring_mini_project_001_group6.util.SortByBookmarkField;
+import com.homework.spring_mini_project_001_group6.util.SortDirection;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -64,9 +65,9 @@ public class BookmarkServiceImp implements BookmarkService {
         return new ApiResponse<>("Bookmark status updated to unmarked", HttpStatus.OK, null);
     }
 
-   @Override
-    public ApiResponse<List<ArticleResponse>> getBookmarksByUser(Long userId, int pageNo, int pageSize, BookmarkField sortBy, String sortDirection) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.Direction.fromString(sortDirection), sortBy.getField());
+    @Override
+    public ApiResponse<List<ArticleResponse>> getBookmarksByUser(Long userId, int pageNo, int pageSize, SortByBookmarkField sortBy, SortDirection sortDirection) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.valueOf(sortDirection.name()), sortBy.getField()));
         Page<Bookmark> bookmarks = bookmarkRepository.findAllByUser_UserIdAndStatus(userId, true, pageable);
 
         if (bookmarks.isEmpty()) {

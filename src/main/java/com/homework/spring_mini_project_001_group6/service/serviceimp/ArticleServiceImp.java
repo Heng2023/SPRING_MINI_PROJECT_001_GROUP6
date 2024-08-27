@@ -34,7 +34,7 @@ public class ArticleServiceImp implements ArticleService {
     @Autowired
     private UserRepository userRepository;
 
-   @Override
+    @Override
     public ApiResponse<ArticleResponse> createArticle(ArticleRequest articleRequest, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));

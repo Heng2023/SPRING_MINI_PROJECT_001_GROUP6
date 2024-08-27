@@ -6,6 +6,8 @@ import com.homework.spring_mini_project_001_group6.model.dto.requestbody.Article
 import com.homework.spring_mini_project_001_group6.model.dto.requestbody.CommentRequest;
 import com.homework.spring_mini_project_001_group6.model.dto.response.*;
 import com.homework.spring_mini_project_001_group6.service.ArticleService;
+import com.homework.spring_mini_project_001_group6.util.SortByArticleField;
+import com.homework.spring_mini_project_001_group6.util.SortDirection;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,17 +39,10 @@ public class ArticleController {
     public ResponseEntity<ApiResponse<List<ArticleResponse>>> getAllArticles(
             @RequestParam(defaultValue = "0") int pageNo,
             @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(defaultValue = "articleId") String sortBy,
-            @RequestParam(defaultValue = "ASC") String sortDirection) {
+            @RequestParam(defaultValue = "articleId") SortByArticleField sortBy,
+            @RequestParam(defaultValue = "ASC") SortDirection sortDirection) {
 
-        List<String> validSortFields = List.of("articleId", "title", "description", "createdAt", "updatedAt");
-
-        if (!validSortFields.contains(sortBy)) {
-            throw new InvalidDataException("Invalid sortBy field: " + sortBy);
-        }
-
-        Sort.Direction direction = Sort.Direction.fromString(sortDirection.toUpperCase());
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(direction, sortBy));
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.valueOf(sortDirection.name()), sortBy.name()));
         ApiResponse<List<ArticleResponse>> response = articleService.getAllArticles(pageable);
 
         return new ResponseEntity<>(response, response.getStatus());

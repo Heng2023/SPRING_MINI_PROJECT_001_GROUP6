@@ -4,7 +4,8 @@ import com.homework.spring_mini_project_001_group6.model.CustomUserDetails;
 import com.homework.spring_mini_project_001_group6.model.dto.response.ApiResponse;
 import com.homework.spring_mini_project_001_group6.model.dto.response.ArticleResponse;
 import com.homework.spring_mini_project_001_group6.service.BookmarkService;
-import com.homework.spring_mini_project_001_group6.util.BookmarkField;
+import com.homework.spring_mini_project_001_group6.util.SortByBookmarkField;
+import com.homework.spring_mini_project_001_group6.util.SortDirection;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -39,8 +40,8 @@ public class BookmarkController {
     public ResponseEntity<ApiResponse<List<ArticleResponse>>> getAllBookmarks(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                                               @RequestParam(defaultValue = "0") int pageNo,
                                                                               @RequestParam(defaultValue = "10") int pageSize,
-                                                                              @RequestParam(defaultValue = "CREATED_AT") BookmarkField sortBy,
-                                                                              @RequestParam(defaultValue = "ASC") String sortDirection) {
+                                                                              @RequestParam(defaultValue = "CREATED_AT") SortByBookmarkField sortBy,
+                                                                              @RequestParam(defaultValue = "ASC") SortDirection sortDirection) {
         ApiResponse<List<ArticleResponse>> response = bookmarkService.getBookmarksByUser(customUserDetails.getId(), pageNo, pageSize, sortBy, sortDirection);
         return new ResponseEntity<>(response, response.getStatus());
     }

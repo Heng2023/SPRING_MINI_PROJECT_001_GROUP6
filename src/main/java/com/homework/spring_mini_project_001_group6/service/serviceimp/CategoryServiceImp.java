@@ -13,6 +13,7 @@ import com.homework.spring_mini_project_001_group6.repository.CategoryRepository
 import com.homework.spring_mini_project_001_group6.repository.UserRepository;
 import com.homework.spring_mini_project_001_group6.service.CategoryService;
 import com.homework.spring_mini_project_001_group6.util.SortByCategoryField;
+import com.homework.spring_mini_project_001_group6.util.SortDirection;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -21,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,13 +60,11 @@ public class CategoryServiceImp implements CategoryService {
     }
 
     @Override
-    public ApiResponse<List<CategoryResponse>> findAll(int pageNo, int pageSize, SortByCategoryField sortBy, String sortDirection, Long userId) {
-        if (!sortDirection.equalsIgnoreCase("asc") && !sortDirection.equalsIgnoreCase("desc")) {
-            throw new InvalidDataException("Invalid sort direction");
-        }
+    public ApiResponse<List<CategoryResponse>> findAll(int pageNo, int pageSize, SortByCategoryField sortBy, SortDirection sortDirection, Long userId) {
+        Sort.Direction direction = Sort.Direction.valueOf(sortDirection.name());
 
         List<Category> categories = categoryRepository.findAllByUser_userId(
-                PageRequest.of(pageNo, pageSize, Sort.Direction.valueOf(sortDirection.toUpperCase()), sortBy.toString()),
+                PageRequest.of(pageNo, pageSize, direction, sortBy.toString()),
                 userId
         );
 
@@ -74,18 +72,16 @@ public class CategoryServiceImp implements CategoryService {
             throw new SearchNotFoundException("No categories found");
         }
 
-        List<CategoryResponse> categoryResponses = categories.stream().map(category -> {
-            return new CategoryResponse(
-                    category.getCategoryId(),
-                    category.getCategoryName(),
-                    category.getAmountOfArticles(),
-                    category.getCreatedAt(),
-                    category.getUpdatedAt(),
-                    category.getCategoryArticles().stream()
-                            .map(categoryArticle -> ArticleResponse.from(categoryArticle.getArticle()))
-                            .collect(Collectors.toList())
-            );
-        }).collect(Collectors.toList());
+        List<CategoryResponse> categoryResponses = categories.stream().map(category -> new CategoryResponse(
+                category.getCategoryId(),
+                category.getCategoryName(),
+                category.getAmountOfArticles(),
+                category.getCreatedAt(),
+                category.getUpdatedAt(),
+                category.getCategoryArticles().stream()
+                        .map(categoryArticle -> ArticleResponse.from(categoryArticle.getArticle()))
+                        .collect(Collectors.toList())
+        )).collect(Collectors.toList());
 
         return new ApiResponse<>("Get all categories successfully.", HttpStatus.OK, categoryResponses);
     }
