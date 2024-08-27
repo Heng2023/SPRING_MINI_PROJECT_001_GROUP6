@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/files/**").permitAll()
                         .requestMatchers("/api/v1/author/**").hasRole("AUTHOR")
                         .requestMatchers("/api/v1/user/**").hasAnyRole("READER", "AUTHOR")
                         .requestMatchers("/api/v1/bookmark/**").hasAnyRole("READER", "AUTHOR")
