@@ -1,6 +1,5 @@
 package com.homework.spring_mini_project_001_group6.model.entity;
 
-import com.homework.spring_mini_project_001_group6.model.dto.response.CategoryResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,8 +41,4 @@ public class Category {
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryArticle> categoryArticles;
-
-    public static CategoryResponse toCategoryResponse(Category category) {
-        return new CategoryResponse(category.getCategoryId(),category.getCategoryName(),category.amountOfArticles,category.createdAt);
-    }
 }

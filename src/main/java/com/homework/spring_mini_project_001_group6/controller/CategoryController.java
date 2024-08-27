@@ -35,7 +35,7 @@ public class CategoryController {
     public ResponseEntity<ApiResponse<List<CategoryResponse>>> getAllCategory(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                                               @RequestParam(defaultValue = "0")  int pageNo,
                                                                               @RequestParam(defaultValue = "10")   int pageSize,
-                                                                              SortByCategoryField sortBy, @RequestParam(defaultValue = "asc") String sortDirection  ) {
+                                                                              SortByCategoryField sortBy, @RequestParam(defaultValue = "ASC") String sortDirection  ) {
         Long userId = customUserDetails.getId();
         ApiResponse<List<CategoryResponse>> response = categoryService.findAll(pageNo,pageSize,sortBy,sortDirection,userId);
         return new ResponseEntity<>(response,response.getStatus());
