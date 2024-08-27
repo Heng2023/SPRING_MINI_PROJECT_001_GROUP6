@@ -41,6 +41,7 @@ public class ArticleResponse {
                 comment.getCommentId(),
                 comment.getCmt(),
                 comment.getCreatedAt(),
+                comment.getUpdatedAt(),
                 new UserResponse(
                     comment.getUser().getUserId(),
                     comment.getUser().getUsername(),

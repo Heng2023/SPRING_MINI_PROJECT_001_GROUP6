@@ -98,6 +98,7 @@ public class ArticleServiceImp implements ArticleService {
                     comment.getCommentId(),
                     comment.getCmt(),
                     comment.getCreatedAt(),
+                    comment.getUpdatedAt(),
                     new UserResponse(
                         commentUser.getUserId(),
                         commentUser.getUsername(),
@@ -141,6 +142,7 @@ public class ArticleServiceImp implements ArticleService {
                 comment.getCommentId(),
                 comment.getCmt(),
                 comment.getCreatedAt(),
+                comment.getUpdatedAt(),
                 new UserResponse(
                     commentUser.getUserId(),
                     commentUser.getUsername(),
@@ -216,6 +218,7 @@ public class ArticleServiceImp implements ArticleService {
                     comment.getCommentId(),
                     comment.getCmt(),
                     comment.getCreatedAt(),
+                    comment.getUpdatedAt(),
                     new UserResponse(
                             commentUser.getUserId(),
                             commentUser.getUsername(),
@@ -271,6 +274,7 @@ public class ArticleServiceImp implements ArticleService {
                     cmt.getCommentId(),
                     cmt.getCmt(),
                     cmt.getCreatedAt(),
+                    cmt.getUpdatedAt(),
                     new UserResponse(
                             commentUser.getUserId(),
                             commentUser.getUsername(),
@@ -313,6 +317,7 @@ public class ArticleServiceImp implements ArticleService {
                     comment.getCommentId(),
                     comment.getCmt(),
                     comment.getCreatedAt(),
+                    comment.getUpdatedAt(),
                     new UserResponse(
                             commentUser.getUserId(),
                             commentUser.getUsername(),
