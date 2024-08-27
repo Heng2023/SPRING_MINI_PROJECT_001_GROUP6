@@ -6,7 +6,7 @@ import com.homework.spring_mini_project_001_group6.model.dto.response.CommentRes
 
 public interface CommentService {
 
-    ApiResponse<CommentResponse> getCommentById(Long commentId);
+    ApiResponse<CommentResponse> getCommentById(Long commentId, Long UserId);
 
     ApiResponse<CommentResponse> editCommentById(Long id, CommentRequest commentRequest, Long userId);
 

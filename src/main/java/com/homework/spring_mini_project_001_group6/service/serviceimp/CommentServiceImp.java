@@ -20,9 +20,9 @@ public class CommentServiceImp implements CommentService {
     private final CommentRepository commentRepository;
 
     @Override
-    public ApiResponse<CommentResponse> getCommentById(Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new SearchNotFoundException("Comment with ID " + commentId + " not found"));
+    public ApiResponse<CommentResponse> getCommentById(Long commentId, Long userId) {
+        Comment comment = commentRepository.findByCommentIdAndUser_userId(commentId, userId)
+                .orElseThrow(() -> new SearchNotFoundException("Comment with ID " + commentId + " not found or it does not belong to you"));
 
         return new ApiResponse<>("Comment retrieved successfully", HttpStatus.OK, Comment.toCommentResponse(comment));
     }

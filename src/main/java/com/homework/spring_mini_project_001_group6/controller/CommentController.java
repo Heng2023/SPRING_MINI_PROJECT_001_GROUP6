@@ -27,8 +27,10 @@ public class CommentController {
     private ArticleService articleService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<CommentResponse>> getCommentById(@PathVariable Long id) {
-        ApiResponse<CommentResponse> response = commentService.getCommentById(id);
+    public ResponseEntity<ApiResponse<CommentResponse>> getCommentById(@PathVariable Long id,
+                                                                       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Long userId = customUserDetails.getId();
+        ApiResponse<CommentResponse> response = commentService.getCommentById(id, userId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
