@@ -30,7 +30,7 @@ public class CommentServiceImp implements CommentService {
     @Override
     public ApiResponse<CommentResponse> deleteCommentById(Long commentId, Long userId) {
         Comment comment = commentRepository.findByCommentIdAndUser_userId(commentId, userId)
-                .orElseThrow(() -> new SearchNotFoundException("Comment with ID " + commentId + " not found"));
+                .orElseThrow(() -> new SearchNotFoundException("Comment with ID " + commentId + " not found or it is not yours"));
 
         if (!comment.getUser().getUserId().equals(userId)) {
             throw new SearchNotFoundException("Unauthorized: You are not the owner of this comment.");
@@ -44,7 +44,7 @@ public class CommentServiceImp implements CommentService {
     @Override
     public ApiResponse<CommentResponse> editCommentById(Long commentId, CommentRequest commentRequest, Long userId) {
         Comment comment = commentRepository.findByCommentIdAndUser_userId(commentId, userId)
-                .orElseThrow(() -> new SearchNotFoundException("Comment with ID " + commentId + " not found"));
+                .orElseThrow(() -> new SearchNotFoundException("Comment with ID " + commentId + " not found or it is not yours"));
 
         if (!comment.getUser().getUserId().equals(userId)) {
             throw new SearchNotFoundException("Unauthorized: You are not the owner of this comment.");

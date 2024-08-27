@@ -59,7 +59,7 @@ public class CategoryServiceImp implements CategoryService {
         return new ApiResponse<>("A new category is created successfully.", HttpStatus.CREATED, categoryResponse);
     }
 
-   @Override
+    @Override
     public ApiResponse<List<CategoryResponse>> findAll(int pageNo, int pageSize, SortByCategoryField sortBy, String sortDirection, Long userId) {
         if (!sortDirection.equalsIgnoreCase("asc") && !sortDirection.equalsIgnoreCase("desc")) {
             throw new InvalidDataException("Invalid sort direction");
