@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())  // Disable CSRF for APIs using JWT
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()  // Public access to Swagger UI and API docs
-                        .requestMatchers("/api/v1/auth/**").permitAll()  // Allow public access to auth endpoints
+                        .requestMatchers("/api/v1/auth/**","/api/v1/files/**").permitAll()  // Allow public access to auth endpoints
                         .requestMatchers("/api/v1/author/**").hasRole("AUTHOR")  // Only users with AUTHOR role can access
                         .requestMatchers("/api/v1/user/**").hasAnyRole("READER", "AUTHOR")  // Allow both READER and AUTHOR roles to access
                         .anyRequest().authenticated()  // Require authentication for all other requests
