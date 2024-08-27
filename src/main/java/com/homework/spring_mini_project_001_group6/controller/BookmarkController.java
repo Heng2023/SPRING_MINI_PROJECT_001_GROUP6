@@ -35,11 +35,11 @@ public class BookmarkController {
         @AuthenticationPrincipal CustomUserDetails customUserDetails,
         @RequestParam(defaultValue = "0")  int pageNo,
         @RequestParam(defaultValue = "10")   int pageSize,
-        SortByCategoryField sortBy,
+        @RequestParam(defaultValue = "") Long articleId,
         @RequestParam(defaultValue = "asc") String sortDirection
 ){
     Long userId = customUserDetails.getId();
-    ApiResponse<List<ApiResponseBookmark>> response = bookmarkService.findAll(pageNo,pageSize,sortBy,sortDirection,userId);
+    ApiResponse<List<ApiResponseBookmark>> response = bookmarkService.findAll(pageNo,pageSize,articleId,sortDirection,userId);
     return new ResponseEntity<>(response,response.getStatus());
 }
 }

@@ -1,5 +1,6 @@
 package com.homework.spring_mini_project_001_group6.service.serviceimp;
 
+import com.homework.spring_mini_project_001_group6.exception.InvalidDataException;
 import com.homework.spring_mini_project_001_group6.exception.SearchNotFoundException;
 import com.homework.spring_mini_project_001_group6.model.CustomUserDetails;
 import com.homework.spring_mini_project_001_group6.model.dto.response.ApiResponse;
@@ -7,6 +8,7 @@ import com.homework.spring_mini_project_001_group6.model.dto.response.ApiRespons
 import com.homework.spring_mini_project_001_group6.model.dto.response.CategoryResponse;
 import com.homework.spring_mini_project_001_group6.model.entity.Article;
 import com.homework.spring_mini_project_001_group6.model.entity.Bookmark;
+import com.homework.spring_mini_project_001_group6.model.entity.Category;
 import com.homework.spring_mini_project_001_group6.model.entity.User;
 import com.homework.spring_mini_project_001_group6.repository.ArticleRepository;
 import com.homework.spring_mini_project_001_group6.repository.BookMarkRepository;
@@ -19,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,8 +61,24 @@ public class BookmarkServiceImp implements BookmarkService {
         return new ApiResponse<>("An article id "+id+" is unmarked successfully..", HttpStatus.OK, null);
     }
 
+
+
     @Override
-    public ApiResponse<List<ApiResponseBookmark>> findAll(int pageNo, int pageSize, SortByCategoryField sortBy, String sortDirection, Long userId) {
-        return null;
+    public ApiResponse<List<ApiResponseBookmark>> findAll(int pageNo, int pageSize,Long article, String sortDirection, Long userId) {
+//        if(sortDirection.compareToIgnoreCase("asc") !=0 & sortDirection.compareToIgnoreCase("desc") !=0) {
+//            throw new InvalidDataException("Invalid sort direction");
+//        }
+//       Bookmark bookmark = new Bookmark();
+//       List<Bookmark> bookmarkList = bookMarkRepository.findAllByStatusTrue(bookmark.getStatus());
+//       List<Article> articleList = new ArrayList<>();
+//       for (Bookmark bo: bookmarkList){
+//           articleList.add(bo.getArticle());
+//       }
+//
+////        List<CategoryResponse> categoryResponses = categories.stream().map(Category::toCategoryResponse).toList();
+//        List<ApiResponseBookmark> ApiResponseBookmark = bookmarkList.stream().map(bookmarkList).toList();
+//        return new ApiResponse<>("Get all book successfully.", HttpStatus.OK,ApiResponseBookmark);
+    return null;
     }
+
 }
